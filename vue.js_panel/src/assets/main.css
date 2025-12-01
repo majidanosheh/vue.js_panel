@@ -1,0 +1,38 @@
+/* src/assets/main.css */
+
+/* تنظیمات پایه */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Tahoma', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* بعداً فونت وزیر رو اضافه می‌کنیم */
+  direction: rtl; /* حیاتی برای فارسی */
+  text-align: right;
+  background-color: #f4f6f9;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* لینک‌ها */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* اسکرول بار خوشگل‌تر (اختیاری) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
