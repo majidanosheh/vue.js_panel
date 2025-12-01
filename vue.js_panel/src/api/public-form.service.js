@@ -8,10 +8,10 @@ const publicClient = axios.create({
 });
 
 export const publicFormService = {
-  // دریافت ساختار فرم با استفاده از اسلاگ
-  // GET /api/public/forms/{slug}
   async getBySlug(slug) {
-    const response = await publicClient.get(`/api/public/forms/${slug}`);
+    // افزودن timestamp برای جلوگیری از کش شدن درخواست
+    const timestamp = new Date().getTime();
+    const response = await publicClient.get(`/api/public/forms/${slug}?_t=${timestamp}`);
     return response.data;
   },
 

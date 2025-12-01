@@ -28,7 +28,8 @@ export const usePublicFormStore = defineStore('publicForm', () => {
           label: f.label || f.Label,
           fieldType: f.fieldType || f.FieldType,
           isRequired: f.isRequired || f.IsRequired,
-          options: f.options || f.Options
+          options: f.options || f.Options,
+          options: f.options || f.Options || '',
         }));
       }
       

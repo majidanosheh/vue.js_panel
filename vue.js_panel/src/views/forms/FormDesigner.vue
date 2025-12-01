@@ -113,8 +113,23 @@
 
                 <select v-else-if="element.fieldType === 'Select'" disabled>
                   <option>انتخاب کنید...</option>
-                  <option v-for="opt in (element.options ? element.options.split('\n') : [])" :key="opt">{{ opt }}</option>
+                  <option 
+                    v-for="opt in (element.options ? element.options.split('\n') : ['گزینه نمونه ۱', 'گزینه نمونه ۲'])" 
+                    :key="opt"
+                  >
+                    {{ opt }}
+                  </option>
                 </select>
+
+                <div v-else-if="element.fieldType === 'Radio'" class="radio-preview-group">
+                  <div 
+                    v-for="opt in (element.options ? element.options.split('\n') : ['گزینه ۱', 'گزینه ۲'])" 
+                    :key="opt" 
+                    class="radio-item"
+                  >
+                    <input type="radio" disabled /> <label>{{ opt }}</label>
+                  </div>
+                </div>
 
                 <div v-else-if="element.fieldType === 'Radio'" class="radio-group">
                   <div v-for="opt in (element.options ? element.options.split('\n') : ['گزینه ۱', 'گزینه ۲'])" :key="opt" class="radio-item">
