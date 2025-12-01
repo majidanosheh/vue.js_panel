@@ -1,31 +1,26 @@
 import apiClient from './index';
 
-// طبق کنترلر بک‌اند: Route("api/admin/forms")
 const BASE_URL = '/api/admin/forms';
 
 export const formService = {
-  // دریافت لیست همه فرم‌ها
-  async getAll() {
-    const response = await apiClient.get(BASE_URL);
-    return response.data;
+  // ... (کدهای قبلی: getAll, getById, create, delete, addField, deleteField) ...
+  async getAll() { return (await apiClient.get(BASE_URL)).data; },
+  async getById(id) { return (await apiClient.get(`${BASE_URL}/${id}`)).data; },
+  async create(data) { return (await apiClient.post(BASE_URL, data)).data; },
+  async delete(id) { return (await apiClient.delete(`${BASE_URL}/${id}`)).data; },
+  
+  async addField(formId, fieldData) {
+    return (await apiClient.post(`${BASE_URL}/${formId}/fields`, fieldData)).data;
   },
 
-  // دریافت یک فرم خاص (برای آینده)
-  async getById(id) {
-    const response = await apiClient.get(`${BASE_URL}/${id}`);
-    return response.data;
+  async deleteField(fieldId) {
+    return (await apiClient.delete(`${BASE_URL}/fields/${fieldId}`)).data;
   },
 
-  // ایجاد فرم جدید
-  // ورودی: { title: "...", apiSlug: "..." }
-  async create(formData) {
-    const response = await apiClient.post(BASE_URL, formData);
-    return response.data;
-  },
-
-  // حذف فرم
-  async delete(id) {
-    const response = await apiClient.delete(`${BASE_URL}/${id}`);
+  // 👇 متد جدید: ویرایش ویژگی‌های فیلد
+  // PUT /api/admin/forms/fields/{fieldId}
+  async updateField(fieldId, fieldData) {
+    const response = await apiClient.put(`${BASE_URL}/fields/${fieldId}`, fieldData);
     return response.data;
   }
 };

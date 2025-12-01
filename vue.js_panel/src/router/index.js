@@ -10,6 +10,7 @@ import RolesIndex from '@/views/roles/RolesIndex.vue';
 import RolePermissions from '@/views/roles/RolePermissions.vue';
 import FormsIndex from '@/views/forms/FormsIndex.vue';
 import FormDesigner from '@/views/forms/FormDesigner.vue';
+import FormRenderer from '@/views/public/FormRenderer.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -74,6 +75,12 @@ const router = createRouter({
       component: LoginView,
       meta: { guest: true }
     }
+    ,{
+  path: '/view/:slug', // آدرس عمومی: localhost:5173/view/contact-us
+  name: 'public-form',
+  component: FormRenderer,
+  meta: { guest: true } // نیازی به لاگین نیست
+}
   ]
 });
 
