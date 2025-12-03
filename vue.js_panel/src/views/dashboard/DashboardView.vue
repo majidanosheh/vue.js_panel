@@ -1,8 +1,14 @@
 <template>
   <div class="dashboard">
     <h1>📊 داشبورد مدیریتی</h1>
-    <p>به سیستم Anoshe CMS خوش آمدید.</p>
     
+    <div class="debug-box" style="direction: ltr; text-align: left; background: #333; color: #0f0; padding: 20px; margin: 20px 0; border-radius: 8px;">
+      <h3>👮 User Debug Info:</h3>
+      <pre>{{ userStore.user }}</pre>
+      <hr style="border-color: #555;">
+      <p><strong>Is Authenticated:</strong> {{ userStore.isAuthenticated }}</p>
+      <p><strong>Detected Roles:</strong> {{ userStore.user?.Roles || userStore.user?.roles || 'NONE' }}</p>
+    </div>
     <div class="stats-grid">
       <div class="card">
         <h3>وضعیت سیستم</h3>
@@ -12,7 +18,7 @@
   </div>
 </template>
 
-<style scoped>
-.stats-grid { display: flex; gap: 20px; margin-top: 20px; }
-.card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); flex: 1; }
-</style>
+<script setup>
+import { useAuthStore } from '@/stores/authStore';
+const userStore = useAuthStore();
+</script>

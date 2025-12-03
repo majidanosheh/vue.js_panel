@@ -1,4 +1,3 @@
-// src/stores/authStore.js
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
@@ -12,10 +11,15 @@ export const useAuthStore = defineStore('auth', () => {
   const accessToken = ref(localStorage.getItem('accessToken') || null);
   let initialUser = null;
   try {
-    initialUser = JSON.parse(localStorage.getItem('user'));
+    const stored = localStorage.getItem('user');
+    if (stored && stored !== 'undefined') {
+      initialUser = JSON.parse(stored);
+    }
   } catch (e) {
     console.error('Error parsing stored user', e);
+    localStorage.removeItem('user'); // پاکسازی دیتای خراب
   }
+  
   const user = ref(initialUser);
   const loading = ref(false);
   const error = ref(null);
@@ -29,38 +33,44 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       // 1. دریافت پاسخ از سرور
       const data = await authService.login(username, password);
-      console.log('پاسخ سرور:', data); 
+      console.log('📥 پاسخ سرور:', data); 
 
-      // 2. مپ کردن دقیق فیلدها طبق JSON شما
-      // ⚠️ FIX: سرور شما "accessToken" می‌فرستد
-      const token = data.accessToken; 
+      // 2. استخراج توکن (سرور شما accessToken می‌فرستد)
+      const token = data.accessToken || data.token; 
       const refreshToken = data.refreshToken;
 
       if (token) {
-        console.log('✅ توکن دریافت شد.');
-        
-        // 3. ساختن آبجکت کاربر از فیلد‌های پخش شده
+        // 3. ساختن آبجکت کاربر از فیلد‌های پخش شده در JSON
+        // نکته حیاتی: بک‌اند شما fullName و roles را با حروف کوچک می‌فرستد
         let userData = {
-          Id: data.userId,
-          Email: data.email,
-          FullName: data.fullName,
-          Roles: data.roles || [], // نقش‌ها از بادی پاسخ
-          Permissions: [] // فعلا خالی تا از توکن پر شود
+          Id: data.userId || data.uid || data.UserId,
+          Email: data.email || data.Email,
+          FullName: data.fullName || data.FullName || username,
+          
+          // ⚠️ FIX: چک کردن هم حروف کوچک و هم بزرگ
+          Roles: data.roles || data.Roles || [],
+          
+          Permissions: [] 
         };
 
-        // 4. استخراج دسترسی‌ها از داخل توکن (JWT)
+        // لاگ برای اطمینان
+        console.log('🔥 نقش‌های دریافت شده در استور:', userData.Roles);
+
+        // 4. تلاش برای استخراج دسترسی‌ها از توکن
         try {
            const decoded = extractPermissions(token);
            // اگر نقش در بادی نبود، از توکن بردار
-           if (!userData.Roles.length) userData.Roles = decoded.roles || [];
+           if (!userData.Roles || userData.Roles.length === 0) {
+             userData.Roles = decoded.roles || [];
+           }
            userData.Permissions = decoded.permissions || [];
            
-           console.log('🔓 دسترسی‌های استخراج شده:', userData.Permissions);
+           console.log('🔓 نقش‌های کاربر:', userData.Roles);
         } catch (decodeError) {
            console.error('خطا در دیکود توکن:', decodeError);
         }
 
-        // 5. ذخیره‌سازی و آپدیت استیت
+        // 5. آپدیت استیت و ذخیره
         accessToken.value = token;
         user.value = userData;
 
@@ -68,18 +78,17 @@ export const useAuthStore = defineStore('auth', () => {
         localStorage.setItem('user', JSON.stringify(userData));
         if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
         
-        // هدایت به داشبورد (ریلود سخت برای اطمینان)
+        // 6. ریلود سخت برای اعمال سطح دسترسی‌ها در منو
         window.location.href = '/'; 
         return true;
       } else {
-        console.error('❌ فیلد accessToken در پاسخ سرور نبود.');
-        error.value = 'پاسخ نامعتبر سرور.';
+        error.value = 'پاسخ نامعتبر سرور (توکن یافت نشد).';
         return false;
       }
 
     } catch (err) {
       console.error('Login Error:', err);
-      error.value = err.response?.data?.message || 'خطا در ورود';
+      error.value = err.response?.data?.message || 'خطا در برقراری ارتباط';
       throw err;
     } finally {
       loading.value = false;

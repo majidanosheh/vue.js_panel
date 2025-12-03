@@ -45,11 +45,11 @@
 </button>
           
           <button 
-  v-can="PERMISSIONS.VIEW_FORMS"
-  @click="goToSubmissions(form.Id || form.id)" 
-  class="btn-data">
-  📊 ورودی‌ها
-</button>
+            v-can="PERMISSIONS.VIEW_FORMS"
+            @click="$router.push(`/forms/submissions/${form.Id || form.id}`)" 
+            class="btn-data">
+            📊 ورودی‌ها
+          </button>
 
           <button 
             v-can="PERMISSIONS.DELETE_FORMS"

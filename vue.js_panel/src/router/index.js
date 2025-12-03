@@ -11,6 +11,7 @@ import RolePermissions from '@/views/roles/RolePermissions.vue';
 import FormsIndex from '@/views/forms/FormsIndex.vue';
 import FormDesigner from '@/views/forms/FormDesigner.vue';
 import FormRenderer from '@/views/public/FormRenderer.vue';
+import FormSubmissions from '@/views/forms/FormSubmissions.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,6 +40,10 @@ const router = createRouter({
   path: 'forms/design/:id', // آدرس داینامیک با ID
   name: 'form-design',
   component: FormDesigner
+},{
+  path: 'forms/submissions/:id',
+  name: 'form-submissions',
+  component: FormSubmissions
 },
         // 👇 مسیر جدید ویرایش (با پارامتر id)
         {

@@ -9,6 +9,7 @@ export const useFormStore = defineStore('formStore', () => {
   const currentForm = ref(null);
   const loading = ref(false);
   const error = ref(null);
+const gridData = ref({ headers: [], rows: [] });
 
   // 1. دریافت لیست فرم‌ها
   async function fetchForms() {
@@ -203,7 +204,39 @@ async function addFieldToForm(formId, fieldType) {
       return false;
     }
   }
-
+  //8. دریافت ورودی ها 
+  async function fetchSubmissions(formId) {
+    loading.value = true;
+    error.value = null;
+    // پاکسازی داده‌های قبلی
+    gridData.value = { headers: [], rows: [] };
+    
+    try {
+      const data = await formService.getSubmissions(formId);
+      gridData.value = data;
+    } catch (err) {
+      console.error(err);
+      error.value = 'خطا در دریافت ورودی‌ها';
+    } finally {
+      loading.value = false;
+    }
+  }
+  //9.دانلود خروجی
+async function downloadExport(formId) {
+    try {
+      const blob = await formService.exportCsv(formId);
+      // ایجاد لینک دانلود موقت در مرورگر
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `export_${formId}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      alert('خطا در دانلود فایل');
+    }
+  }
   return { 
     forms, currentForm, loading, error, 
     fetchForms, fetchFormById, 
