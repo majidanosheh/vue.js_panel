@@ -1,0 +1,81 @@
+# PROJECT CONTEXT: AnosheCMS (Enterprise Headless CMS)
+# DATE: 2025-12-05
+# STATUS: Phase 3 Completed (Form Builder), Phase 4 Started (Audit Logging)
+
+## 1. 🛠️ Tech Stack & Architecture
+- **Backend:** ASP.NET Core 8 Web API
+  - **ORM:** Entity Framework Core (SQL Server)
+  - **Auth:** JWT (AccessToken + RefreshToken), Identity (Guid), RBAC (Policy-based)
+  - **Features:** Soft Delete, Automatic Auditing (SaveChanges Interceptor), CORS Enabled
+- **Frontend:** Vue 3 + Vite
+  - **State:** Pinia (Setup Stores)
+  - **HTTP:** Axios (w/ Interceptors for Bearer Token)
+  - **Routing:** Vue Router (Nested Routes, Guards)
+  - **UI Libs:** VueDraggable (for Form Builder), Custom CSS (No heavy UI framework yet)
+
+## 2. 📂 Core Backend Files (Key Logic)
+
+### A. Database Context (`ApplicationDbContext.cs`)
+- **Tables:** Users, Roles, ContentTypes, Forms, FormFields, FormSubmissions, AuditLogs.
+- **Auditing:** Automatically captures `Create`, `Update`, `SoftDelete` in `AuditLogs` table via `SaveChanges` override.
+- **Configuration:** `ReferenceHandler.IgnoreCycles` enabled in Startup to prevent JSON loops.
+
+### B. Services
+- **FormService:** Handles CRUD for Forms & Fields.
+  - *Key Logic:* Uses `MapToFormFieldDto` in-memory to avoid EF Core translation errors.
+  - *Key Logic:* `Options` field stored as newline-separated string.
+- **SubmissionService:** Handles public form submissions.
+  - *Key Logic:* Validates `ConditionalLogic` and `ValidationRules`.
+  - *Key Logic:* Exports CSV with BOM for Excel support.
+- **AuthService:** Handles Login & Refresh Token.
+  - *Key Logic:* `Rescue Admin` backdoor available at `/api/auth/rescue`.
+
+### C. Controllers
+- `AdminFormController`: [Authorize] - For designing forms.
+- `PublicFormController`: [AllowAnonymous] - For rendering & submitting forms by end-users.
+- `AdminAuditController`: (Pending Implementation)
+
+## 3. 💻 Core Frontend Files (Vue.js)
+
+### A. Stores (Pinia)
+- **authStore.js:** - Handles Login/Logout.
+  - Decodes JWT to extract `Roles` and `Permissions`.
+  - Handles both PascalCase (Backend) and camelCase mapping.
+- **formStore.js:**
+  - Manages Form Builder state.
+  - `addFieldToForm`: Generates safe names (lowercase).
+  - `updateFieldProperties`: Sends full DTO to update specific fields.
+  - Solves "Page Refresh" issue by normalizing field names from API.
+
+### B. Views
+- **FormDesigner.vue:** - Drag & Drop interface using `vuedraggable`.
+  - Sidebar toggles between "Toolbox" and "Properties Panel".
+  - Fields: Text, TextArea, Number, Select, Radio, Checkbox, Date.
+- **FormRenderer.vue (Public):**
+  - Dynamic rendering engine based on JSON schema.
+  - Parses `options` string (split by `\n`) for Select/Radio.
+- **UsersIndex.vue / RolesIndex.vue:**
+  - Full CRUD with `v-can` directive for permission checking.
+
+## 4. ✅ Current Status (What is DONE)
+1.  **Auth System:** Complete. Login, Token Refresh, RBAC, "Rescue Admin".
+2.  **User Management:** Complete. Create/Edit/Delete users.
+3.  **Role Management:** Complete. Create roles, Assign permissions (Checkbox Matrix).
+4.  **Form Builder:** - Designer (Drag & Drop) ✅
+    - Field Properties (Label, Required, Options) ✅
+    - Public Render & Submission ✅
+    - Data Persistence (SQL) ✅
+    - CSV Export ✅
+
+## 5. 🚧 Pending Tasks (Next Steps)
+1.  **Audit Log Viewer (Phase 4):**
+    - Backend: `IAuditLogService`, `AuditLogDto`, `AdminAuditController` (Created but needs verifying).
+    - Frontend: `AuditIndex.vue` (Grid view for logs), `audit.service.js`.
+2.  **Content Management (Phase 5):**
+    - Defining Content Types (Articles, Products).
+    - Content Entry Editor.
+
+## 6. ⚠️ Known Issues / Notes
+- **Database:** `AuditLogs` table updated to allow NULL in `OldValues` (Fixed via migration).
+- **Serialization:** Backend uses `CamelCase` but Frontend handles mixed casing for robustness.
+- **Startup:** `ISubmissionService` registered manually. `AddAutoMapper` added.

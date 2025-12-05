@@ -1,32 +1,24 @@
 import apiClient from './index';
-
 const BASE_URL = '/api/admin/roles';
 
 export const roleService = {
-  // دریافت لیست نقش‌ها
-  async getAll() {
-    const response = await apiClient.get(BASE_URL);
-    return response.data;
+  async getAll() { return (await apiClient.get(BASE_URL)).data; },
+  
+  // دریافت لیست چک‌باکس‌ها
+  async getAllPermissions() { return (await apiClient.get(`${BASE_URL}/permissions`)).data; },
+  
+  // دریافت تیک‌های زده شده برای یک نقش
+  async getRolePermissions(id) { return (await apiClient.get(`${BASE_URL}/${id}/permissions`)).data; },
+  
+  // ذخیره تیک‌ها
+  async updatePermissions(id, perms) { return (await apiClient.put(`${BASE_URL}/${id}/permissions`, { permissionNames: perms })).data; },
+
+  // 👇 متدهای جدید که گم شده بودند
+  async create(roleData) {
+    return (await apiClient.post(BASE_URL, roleData)).data;
   },
 
-  // دریافت لیست تمام دسترسی‌های مجاز سیستم (گروه‌بندی شده)
-  async getAllPermissions() {
-    const response = await apiClient.get(`${BASE_URL}/permissions`);
-    return response.data;
-  },
-
-  // دریافت دسترسی‌های فعالِ یک نقش خاص
-  async getRolePermissions(roleId) {
-    const response = await apiClient.get(`${BASE_URL}/${roleId}/permissions`);
-    return response.data;
-  },
-
-  // ذخیره دسترسی‌های جدید برای نقش
-  async updatePermissions(roleId, permissionNames) {
-    // طبق DTO بک‌اند: UpdateRolePermissionsRequest
-    const response = await apiClient.put(`${BASE_URL}/${roleId}/permissions`, { 
-      permissionNames: permissionNames 
-    });
-    return response.data;
+  async delete(id) {
+    return (await apiClient.delete(`${BASE_URL}/${id}`)).data;
   }
 };

@@ -47,6 +47,33 @@ export const useRoleStore = defineStore('roleStore', () => {
       loading.value = false;
     }
   }
+  async function createRole(name, displayName) {
+    loading.value = true;
+    try {
+      await roleService.create({ name, displayName });
+      await fetchRoles(); // لیست را رفرش کن
+      return true;
+    } catch (err) {
+      alert(err.response?.data?.Message || 'خطا در ایجاد نقش');
+      return false;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  // 👇 اکشن جدید: حذف نقش
+  async function deleteRole(id) {
+    if (!confirm('آیا مطمئن هستید؟')) return;
+    loading.value = true;
+    try {
+      await roleService.delete(id);
+      roles.value = roles.value.filter(r => r.id !== id && r.Id !== id);
+    } catch (err) {
+      alert(err.response?.data?.Message || 'خطا در حذف');
+    } finally {
+      loading.value = false;
+    }
+  }
 
   return { 
     roles, 
