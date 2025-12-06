@@ -1,7 +1,5 @@
-// src/api/auth.service.js
 import apiClient from './index';
 
-// ⚠️ نکته مهم: حتما باید export const باشه
 export const authService = {
   async login(username, password) {
     // سرور دات‌نت شما فیلد email می‌خواهد

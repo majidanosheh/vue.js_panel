@@ -2,7 +2,7 @@
 # 👤 Lead Developer: Majid
 # 🤖 AI Role: Senior Full-Stack Architect & Code Reviewer
 # 🎯 Core Goal: Enterprise-grade Headless CMS (High maintainability, Scalability, Performance)
-# 📅 Last Update: 2025-12-05 (Phase 3 Completed, Phase 4 Audit Started)
+# 📅 Last Update: 2025-12-06 (Phase 4 Completed, Phase 5 Started)
 
 ## 1. 🏗️ Architecture & Patterns (The Rules)
 - **Style:** Clean Architecture (Onion Architecture).
@@ -10,71 +10,57 @@
   - **Application:** Interfaces, DTOs, Services (Depends on Domain).
   - **Infrastructure:** DbContext, Migrations, FileSystem, Email (Depends on Application).
   - **API:** Controllers, Middleware, Entry Point (Depends on Application & Infra).
-
 - **Design Patterns:**
   - **Result Pattern:** Use wrapper objects (Success/Fail) instead of Exceptions for logic flow.
   - **Dependency Injection (DI):** Strict usage for all services.
-  - **Repository/UoW:** (Target Goal) Currently using Service->DbContext pattern, moving towards abstraction where necessary.
 
 ## 2. 🛠️ Technology Stack
 - **Backend:** ASP.NET Core 8 (Web API)
   - **ORM:** Entity Framework Core (SQL Server)
   - **Validation:** FluentValidation (Server-side)
-  - **Mapping:** Manual Mapping / AutoMapper (Registered)
+  - **Mapping:** Manual Mapping
 - **Frontend:** Vue.js 3 (Composition API, <script setup>)
   - **State:** Pinia (Setup Stores)
-  - **Build:** Vite
   - **HTTP:** Axios (w/ Robust Interceptors)
-  - **UI/Style:** Custom CSS + Bootstrap (Planned), VueDraggable (for FormBuilder)
+  - **UI:** Custom CSS + VueDraggable (FormBuilder) + Sticky Table Headers
 
-## 3. 🗄️ Database & EF Core Strategy
-- **Approach:** Code-First with Migrations.
-- **Configuration:** Fluent API (in `IEntityTypeConfiguration` classes). **No Data Attributes** in Domain.
-- **Performance:** - `AsNoTracking()` for read-only queries.
-  - `SplitQuery` for complex joins.
-- **Features:**
-  - **Soft Delete:** Implemented via `ISoftDelete` & Global Query Filters.
-  - **Auditing:** Automatic `Create/Update` tracking in `SaveChanges` override.
-  - **JSON Handling:** `ReferenceHandler.IgnoreCycles` enabled in Startup.
-
-## 4. ✅ Current Implementation Status (What is DONE)
+## 3. ✅ Current Implementation Status (What is DONE)
 
 ### A. Authentication & Security 🛡️
-- **Auth:** JWT (Access + Refresh Token).
-- **Backdoor:** `Rescue Admin` endpoint available at `/api/auth/rescue`.
-- **RBAC:** Dynamic Permissions (not just Roles).
-- **Frontend:** `authStore.js` handles casing (Pascal/Camel) & decodes JWT permissions. `v-can` directive implemented.
+- JWT Auth (Access + Refresh Token), RBAC (Dynamic Permissions), Rescue Admin.
 
 ### B. User Management 👥
-- Full CRUD (Create, Edit, Soft Delete, List).
-- Role Management with Permission Matrix (Checkbox UI).
+- Full CRUD, Role Management with Permission Matrix.
 
-### C. Form Builder Module (The Core Feature) 📝
-- **Backend:**
-  - `Form` & `FormField` entities (with `Options` property for Select/Radio).
-  - `PublicFormController`: Anonymous access for rendering.
-  - **Fixes:** Solved JSON 500 error & EF Core translation issues (`MapToDTO` in memory).
-- **Frontend:**
-  - **Designer:** Drag & Drop interface (`VueDraggable`).
-  - **Properties Panel:** Edit Label, Required, Options (newline separated).
-  - **Renderer:** Public view engine (`/view/:slug`) fully functional.
-  - **Store:** Smart updates (no page refresh data loss).
+### C. Form Builder Module 📝
+- **Backend:** `Form`, `FormField`, `FormSubmission` entities. Dynamic validation.
+- **Frontend:** Drag & Drop Designer, Public Renderer, Submissions Grid (CSV Export).
 
-## 5. 🚧 Pending Tasks (Roadmap)
-1.  **Audit Log Viewer (Phase 4 - Current Focus):**
-    - **Status:** DB table `AuditLogs` is filling up automatically.
-    - **Missing:** Admin UI to view logs (Grid), Filtering, JSON Diff Viewer.
-    - **Action:** Create `AuditLogService`, `AuditLogDto`, `AdminAuditController`.
-2.  **Content Management (Phase 5):**
-    - Define dynamic Content Types (Articles, Products).
-    - Content Entry Editor.
+### D. Audit Logging & Monitoring (Phase 4) 📜
+- **Backend:** - `AuditLogs` table captures Create/Update/Delete via SaveChanges Interceptor.
+  - `AuditLogService` joins Users table & handles pagination.
+  - `AdminAuditController` exposes logs to API.
+- **Frontend:** - `AuditIndex.vue`: Enterprise-grade grid with sticky headers & badges.
+  - **JSON Diff Viewer:** Side-by-side comparison of OldValues vs NewValues in modal.
 
-## 6. 🤖 AI Persona Instructions (My Job)
-1.  **Code Review First:** Check for Clean Arch violations (e.g., Domain depending on Infra) before generating code.
-2.  **Safety:** Assume all inputs are dangerous (XSS/SQLi prevention).
-3.  **Refactoring:** Suggest cleaner/shorter logic (e.g., extracting methods).
-4.  **Communication Style:**
-    - **Direct & Technical:** No fluff.
-    - **Visual-First:** Use emojis, bullet points, and clear structure.
-    - **Step-by-Step:** Break down complex tasks (ADHD-friendly).
-    - **Continuity:** Always remember the project state from this file.
+## 4. 🚧 Pending Tasks (Roadmap)
+
+### Phase 5: Content Management Core (Current Focus) 🏗️
+**Goal:** Create a flexible "Headless" content structure (Types & Entries).
+
+1.  **Content Types (Schema Builder):**
+    - [cite_start]**Backend:** Ensure `ContentType`, `ContentField` entities are robust[cite: 77, 105].
+    - **Frontend:** UI to define new content types (e.g., "Blog Post", "Product") similar to Form Builder but for DB schema.
+    
+2.  **Content Entries (Data Entry):**
+    - **Backend:** Dynamic CRUD for `ContentItem` (stored as JSON in SQL).
+    - **Frontend:** Auto-generated forms based on Content Type schema for users to input data.
+
+3.  **Content API (Headless):**
+    - Public API for fetching content (e.g., `/api/content/posts`).
+
+## 5. 🤖 AI Persona Instructions (My Job)
+1.  **Continuity:** Always check `AnosheCMS_Master_Context.txt` first.
+2.  **Code Quality:** Prefer clean, readable code over clever one-liners. Use explicit DTOs.
+3.  **Safety:** Prevent XSS/SQLi. Use `AsNoTracking` for read operations.
+4.  **UI Consistency:** Match new pages (Content Types) with the style of `AuditIndex.vue` and `FormsIndex.vue`.

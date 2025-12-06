@@ -20,5 +20,7 @@ export const PERMISSIONS = {
   DELETE_FORMS: 'Permissions.DeleteForms',
   
   // دسترسی‌های عمومی (در صورت نیاز)
-  MANAGE_SETTINGS: 'Permissions.ManageSettings'
+  MANAGE_SETTINGS: 'Permissions.ManageSettings',
+  VIEW_AUDIT_LOGS: 'Permissions.AuditLogs.View'
+  
 };

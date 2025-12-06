@@ -29,6 +29,11 @@
             📝 فرم‌ساز
           </router-link>
         </li>
+        <li v-can="PERMISSIONS.VIEW_AUDIT_LOGS">
+  <router-link to="/audit-logs" active-class="active">
+    📜 لاگ‌های سیستم
+  </router-link>
+</li>
       </ul>
     </nav>
   </aside>
